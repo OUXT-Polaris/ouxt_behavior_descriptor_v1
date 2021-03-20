@@ -1,5 +1,10 @@
 # ouxt_behavior_descriptor_v1
 
+## Function
+- load behavior tree from xml file
+    - xml files are generated or edited by Groot
+- abstract blackboard description and smart evaluation
+    - evaluation by lua
 
 ## Completed descriptor example
 ~~~yaml
