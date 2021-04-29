@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 
-template<typename T>
 struct BlackBoard
 {
   std::string input;
