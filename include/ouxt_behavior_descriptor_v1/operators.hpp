@@ -15,9 +15,9 @@
 #ifndef OUXT_BEHAVIOR_DESCRIPTOR_V1__OPERATORS_HPP_
 #define OUXT_BEHAVIOR_DESCRIPTOR_V1__OPERATORS_HPP_
 
-void operator(const YAML::Node &node, Format &format) {
+void operator(const YAML::Node & node, Format & format) {
   node["behavior"] >> Format.behavior;
-  const YAML::Node &objects_node = node["objects"];
+  const YAML::Node & objects_node = node["objects"];
   for (auto object _node : objects_node) {
     Object object;
     object_node >> object;
@@ -25,9 +25,10 @@ void operator(const YAML::Node &node, Format &format) {
   }
 }
 
-void operator>>(const YAML::Node &node, Object &object) {
+void operator>>(const YAML::Node & node, Object & object)
+{
   node["uuid"] >> object.uuid;
-  const YAML::Node &attributes_node = node["attributes"];
+  const YAML::Node & attributes_node = node["attributes"];
   for (auto attribute_node : attributes_node) {
     Attribute attribute;
     attribute_node >> attribute;
@@ -35,25 +36,29 @@ void operator>>(const YAML::Node &node, Object &object) {
   }
   node["pose"] >> object.pose;
 }
-void operator>>(const YAML::Node &node, Pose &pose) {
+void operator>>(const YAML::Node & node, Pose & pose)
+{
   node["position"] >> pose.position;
   node["orientation"] >> pose.orientation;
 }
-void operator>>(const YAML::Node &node, Position &position) {
+void operator>>(const YAML::Node & node, Position & position)
+{
   node["x"] >> position.x;
   node["y"] >> position.y;
   node["z"] >> position.z;
 }
-void operator>>(const YAML::Node &node, Quaternion &quaternion) {
+void operator>>(const YAML::Node & node, Quaternion & quaternion)
+{
   node["x"] >> quaternion.x;
   node["y"] >> quaternion.y;
   node["z"] >> quaternion.z;
   node["w"] >> quaternion.w;
 }
 
-void operator>>(const YAML::Node &node, Behavior &behavior) {
+void operator>>(const YAML::Node & node, Behavior & behavior)
+{
   node["description"] >> behavior.description;
-  const YAML::Node &blackboards_node = node["blackboard"];
+  const YAML::Node & blackboards_node = node["blackboard"];
   for (auto blackboard_node : blackboards_node) {
     BlackBoard blackboard;
     blackboard_node >> blackboard;
@@ -61,7 +66,8 @@ void operator>>(const YAML::Node &node, Behavior &behavior) {
   }
 }
 
-void operator>>(const YAML::Node &node, BlackBoard &blackBoard) {
+void operator>>(const YAML::Node & node, BlackBoard & blackboard)
+{
   node["input"] >> blackboard.input;
   node["eval"] >> blackboard.eval;
 }
