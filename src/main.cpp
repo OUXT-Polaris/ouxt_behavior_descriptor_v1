@@ -12,7 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-int main()
+#include "rclcpp/rclcpp.hpp"
+//#include "ouxt_behavior_descriptor_v1/visibility.hpp"
+#include "ouxt_behavior_descriptor_v1/data_structures.hpp"
+#include "ouxt_behavior_descriptor_v1/operators.hpp"
+
+class Component : public rclcpp::Node{
+public:
+  explicit Component(const rclcpp::NodeOptions & options) : rclcpp::Node("ouxt_behavior_descriptor_v1_node",options)
+  {
+    declare_parameter("config_path", "");
+    get_parameter("config_path", config_path_);
+    std::cout << config_path_ << std::endl;
+
+    node_ = YAML::LoadFile(config_path_);
+  }
+  ~Component(){}
+  std::string config_path_;
+  YAML::Node node_;
+};
+int main(int argc, char * argv[])
 {
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions options;
+  auto component = std::make_shared<Component>(options);
+  rclcpp::spin(component);
+  rclcpp::shutdown();
   return 0;
 }
