@@ -11,8 +11,8 @@
 behavior:
     description : "$(find-pkg-share robotx_setup)/root.xml"
     blackboard:
-        input : next_goal
-        eval: "between(filter(find(red,buoy), local_position.z >=0), filter(find(green,buoy), local_position.z >=0))"    # <- luaで評価    
+        - input : next_goal
+          eval: "between(filter(find(red,buoy), local_position.z >=0), filter(find(green,buoy), local_position.z >=0))"    # <- luaで評価    
 objects:
     - uuid : 00000000
       attributes:
