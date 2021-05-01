@@ -21,60 +21,104 @@
 
 void operator>>(const YAML::Node & node, Position & position)
 {
-  position.x = node["x"].as<double>();
-  position.y = node["y"].as<double>();
-  position.z = node["z"].as<double>();
+  try {
+    position.x = node["x"].as<double>();
+    position.y = node["y"].as<double>();
+    position.z = node["z"].as<double>();
+  }catch(...){
+    position.x = 0.0;
+    position.y = 0.0;
+    position.z = 0.0;
+    std::cout << "parse error : Position" << std::endl;
+  }
+
 }
 void operator>>(const YAML::Node & node, Quaternion & quaternion)
 {
-  quaternion.x = node["x"].as<double>();
-  quaternion.y = node["y"].as<double>();
-  quaternion.z = node["z"].as<double>();
-  quaternion.w = node["w"].as<double>();
+  try {
+    quaternion.x = node["x"].as<double>();
+    quaternion.y = node["y"].as<double>();
+    quaternion.z = node["z"].as<double>();
+    quaternion.w = node["w"].as<double>();
+  }catch(...){
+    quaternion.x = 0.0;
+    quaternion.y = 0.0;
+    quaternion.z = 0.0;
+    quaternion.w = 0.0;
+    std::cout << "parse error : Quaternion" << std::endl;
+  }
 }
 
 void operator>>(const YAML::Node & node, Pose & pose)
 {
-  node["position"] >> pose.position;
-  node["orientation"] >> pose.orientation;
+  try {
+    node["position"] >> pose.position;
+    node["orientation"] >> pose.orientation;
+  }catch(...){
+    std::cout << "parse error : Pose" << std::endl;
+  }
+
 }
 
 void operator>>(const YAML::Node & node, Object & object)
 {
-  object.uuid = node["uuid"].as<int>();
-  const YAML::Node & attributes_node = node["attributes"];
-  for (auto attribute_node : attributes_node) {
-    std::string attribute = attribute_node.as<std::string>();
-    object.attributes.push_back(attribute);
+  try {
+    object.uuid = node["uuid"].as<int>();
+    const YAML::Node &attributes_node = node["attributes"];
+    for (auto attribute_node : attributes_node) {
+      std::string attribute = attribute_node.as<std::string>();
+      object.attributes.push_back(attribute);
+    }
+    node["pose"] >> object.pose;
+  }catch(...){
+    std::cout << "parse error : Object" << std::endl;
   }
-  node["pose"] >> object.pose;
 }
 
 void operator>>(const YAML::Node & node, BlackBoard & blackboard)
 {
-  blackboard.input = node["input"].as<std::string>();
-  blackboard.eval = node["eval"].as<std::string>();
+  try {
+    blackboard.input = node["input"].as<std::string>();
+    blackboard.eval = node["eval"].as<std::string>();
+  }catch(...){
+    blackboard.input = "";
+    blackboard.eval = "";
+    std::cout << "parse error : BlackBoard" << std::endl;
+  }
 }
 
 void operator>>(const YAML::Node & node, Behavior & behavior)
 {
-  behavior.description = node["description"].as<std::string>();
-  const YAML::Node & blackboards_node = node["blackboard"];
-  for (auto blackboard_node : blackboards_node) {
-    BlackBoard blackboard;
-    blackboard_node >> blackboard;
-    behavior.blackboard.push_back(blackboard);
+  try {
+    behavior.description = node["description"].as<std::string>();
+    const YAML::Node &blackboards_node = node["blackboard"];
+    for (auto blackboard_node : blackboards_node) {
+      BlackBoard blackboard;
+      blackboard_node >> blackboard;
+      behavior.blackboard.push_back(blackboard);
+    }
+  }catch(...){
+    behavior.description = "";
+    std::cout << "parse error : Behavior" << std::endl;
   }
 }
 
 void operator>>(const YAML::Node & node, Format & format) {
-  node["behavior"] >> format.behavior;
-  const YAML::Node & objects_node = node["objects"];
-  for (auto object_node : objects_node) {
-    Object object;
-    object_node >> object;
-    format.objects.push_back(object);
+  try {
+    node["behavior"] >> format.behavior;
+    const YAML::Node & objects_node = node["objects"];
+    for (auto object_node : objects_node) {
+      Object object;
+      object_node >> object;
+      format.objects.push_back(object);
+    }
   }
+  catch(...)
+  {
+    std::cout << "parse error : Format" << std::endl;
+  }
+
+
 }
 
 #endif  // OUXT_BEHAVIOR_DESCRIPTOR_V1__OPERATORS_HPP_
