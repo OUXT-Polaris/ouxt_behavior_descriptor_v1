@@ -12,24 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "rclcpp/rclcpp.hpp"
-//#include "ouxt_behavior_descriptor_v1/visibility.hpp"
+//  #include "ouxt_behavior_descriptor_v1/visibility.hpp"
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
-class Component : public rclcpp::Node{
+#include "lauxlib.h"
+#include "lua.hpp"
+#include "lualib.h"
+
+struct EvaluationBlock
+{
+  std::string evaluation;
+  std::string result;
+  void evaluate(lua_State * state)
+  {
+    // TODO(HansRobo)
+  }
+};
+class Component : public rclcpp::Node
+{
 public:
-  explicit Component(const rclcpp::NodeOptions & options) : rclcpp::Node("ouxt_behavior_descriptor_v1_node",options)
+  explicit Component(const rclcpp::NodeOptions & options)
+  : rclcpp::Node("ouxt_behavior_descriptor_v1_node", options)
   {
     declare_parameter("config_path", "");
     get_parameter("config_path", config_path_);
-    std::cout << config_path_ << std::endl;
+    declare_parameter("update_rate", 60);
+    get_parameter("update_rate", update_rate_);
 
-    node_ = YAML::LoadFile(config_path_);
+    using namespace std::literals::chrono_literals;
+    timer_ = create_wall_timer(1s, std::bind(&Component::evaluationCallback,this));
+
+    initialize(config_path_);
   }
-  ~Component(){}
+  ~Component() {}
+
+  void initialize(std::string file_path)
+  {
+    node_ = YAML::LoadFile(config_path_);
+    node_ >> format_;
+    lua_state_ = luaL_newstate();
+    luaL_openlibs(lua_state_);
+  }
+
+  void evaluationCallback()
+  {
+    for (auto & block : evaluation_blocks_) {
+      block.evaluate(lua_state_);
+    }
+  }
+
   std::string config_path_;
+  float update_rate_;
   YAML::Node node_;
+  Format format_;
+  lua_State * lua_state_ = nullptr;
+  std::vector<EvaluationBlock> evaluation_blocks_;
+  rclcpp::TimerBase::SharedPtr timer_;
 };
 int main(int argc, char * argv[])
 {
