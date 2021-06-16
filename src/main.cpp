@@ -21,18 +21,20 @@
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
-#include "lauxlib.h"
+//#include "lauxlib.h"
 #include "lua.hpp"
-#include "lualib.h"
+//#include "lualib.h"
+//#define SOL_ALL_SAFETIES_ON 1
+//#include <sol/sol.hpp>
 
 struct EvaluationBlock
 {
   std::string evaluation;
   std::string result;
-  void evaluate(lua_State * state)
-  {
-    // TODO(HansRobo)
-  }
+//  void evaluate(lua_State * state)
+//  {
+//    // TODO(HansRobo)
+//  }
 };
 class Component : public rclcpp::Node
 {
@@ -63,7 +65,7 @@ public:
   void evaluationCallback()
   {
     for (auto & block : evaluation_blocks_) {
-      block.evaluate(lua_state_);
+//      block.evaluate(lua_state_);
     }
   }
 
