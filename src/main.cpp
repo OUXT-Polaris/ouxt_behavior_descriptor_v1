@@ -24,8 +24,9 @@
 //#include "lauxlib.h"
 #include "lua.hpp"
 //#include "lualib.h"
-//#define SOL_ALL_SAFETIES_ON 1
+#define SOL_ALL_SAFETIES_ON 1
 //#include <sol/sol.hpp>
+#include <ament_index_cpp/get_package_share_directory.hpp>
 
 struct EvaluationBlock
 {
@@ -42,21 +43,21 @@ public:
   explicit Component(const rclcpp::NodeOptions & options)
   : rclcpp::Node("ouxt_behavior_descriptor_v1_node", options)
   {
-    declare_parameter("config_path", "");
+    declare_parameter<std::string>("config_path", "test.xml");
     get_parameter("config_path", config_path_);
-    declare_parameter("update_rate", 60);
+    declare_parameter<double>("update_rate", 60.0);
     get_parameter("update_rate", update_rate_);
 
     using namespace std::literals::chrono_literals;
     timer_ = create_wall_timer(1s, std::bind(&Component::evaluationCallback,this));
-
+    config_path_ = ament_index_cpp::get_package_share_directory("ouxt_behavior_descriptor_v1") + "/test/example/test.yaml";
     initialize(config_path_);
   }
   ~Component() {}
 
   void initialize(std::string file_path)
   {
-    node_ = YAML::LoadFile(config_path_);
+    node_ = YAML::LoadFile(file_path);
     node_ >> format_;
     lua_state_ = luaL_newstate();
     luaL_openlibs(lua_state_);

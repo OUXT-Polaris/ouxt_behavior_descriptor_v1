@@ -12,7 +12,7 @@
   <depend>yaml-cpp</depend>
   <depend>sol_vendor</depend>
   <depend>lua_vendor</depend>
-<!--  <depend>lua</depend>-->
+  <depend>ament_index_cpp</depend>
 
   <!-- <depend>ament_cmake_auto</depend> -->
   <depend>rclcpp</depend>
