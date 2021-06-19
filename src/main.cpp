@@ -21,21 +21,18 @@
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
-//#include "lauxlib.h"
-#include "lua.hpp"
-//#include "lualib.h"
 #define SOL_ALL_SAFETIES_ON 1
-//#include <sol/sol.hpp>
+#include <sol/sol.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
 struct EvaluationBlock
 {
   std::string evaluation;
   std::string result;
-//  void evaluate(lua_State * state)
-//  {
-//    // TODO(HansRobo)
-//  }
+  void evaluate(sol::state &state)
+  {
+    // TODO(HansRobo)
+  }
 };
 class Component : public rclcpp::Node
 {
@@ -59,14 +56,14 @@ public:
   {
     node_ = YAML::LoadFile(file_path);
     node_ >> format_;
-    lua_state_ = luaL_newstate();
-    luaL_openlibs(lua_state_);
+
+    lua_.open_libraries(sol::lib::base);
   }
 
   void evaluationCallback()
   {
     for (auto & block : evaluation_blocks_) {
-//      block.evaluate(lua_state_);
+      block.evaluate(lua_);
     }
   }
 
@@ -74,7 +71,7 @@ public:
   float update_rate_;
   YAML::Node node_;
   Format format_;
-  lua_State * lua_state_ = nullptr;
+  sol::state lua_;
   std::vector<EvaluationBlock> evaluation_blocks_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
