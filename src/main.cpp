@@ -23,31 +23,31 @@
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
 #define SOL_ALL_SAFETIES_ON 1
-#include <sol/sol.hpp>
-#include <ament_index_cpp/get_package_share_directory.hpp>
+#include "sol/sol.hpp"
+#include "ament_index_cpp/get_package_share_directory.hpp"
 
-struct EvaluationBlockBase{
+struct EvaluationBlockBase
+{
   std::string evaluation;
-  virtual void evaluate(sol::state &state) = 0;
+  virtual void evaluate(sol::state & state) = 0;
 };
-template <class T>
+template<class T>
 struct EvaluationBlock : EvaluationBlockBase
 {
   T result;
 
-  void evaluate(sol::state &state) override
+  void evaluate(sol::state & state) override
   {
     std::string eval = "return " + evaluation;
     auto result = state.script(eval);
-    if(result.valid()){
+    if (result.valid()) {
       this->result = static_cast<T>(result);
       std::cout << "Evaluation : " << this->result << std::endl;
-    }else{
+    } else {
       std::cout << "Evaluation " << evaluation << " has failed!" << std::endl;
     }
   }
 };
-
 
 
 class Component : public rclcpp::Node
@@ -62,8 +62,9 @@ public:
     get_parameter("update_rate", update_rate_);
 
     using namespace std::literals::chrono_literals;
-    timer_ = create_wall_timer(1s, std::bind(&Component::evaluationCallback,this));
-    config_path_ = ament_index_cpp::get_package_share_directory("ouxt_behavior_descriptor_v1") + "/test/example/test.yaml";
+    timer_ = create_wall_timer(1s, std::bind(&Component::evaluationCallback, this));
+    config_path_ = ament_index_cpp::get_package_share_directory("ouxt_behavior_descriptor_v1") +
+      "/test/example/test.yaml";
     initialize(config_path_);
   }
   ~Component() {}
@@ -75,10 +76,10 @@ public:
 
     lua_.open_libraries(sol::lib::base);
 
-    if(node_["behavior"]["blackboard"]) {
+    if (node_["behavior"]["blackboard"]) {
       for (auto board : node_["behavior"]["blackboard"]) {
-        if(!board["eval"]) continue;
-        // TODO : make custome type evaluation
+        if (!board["eval"]) {continue;}
+        // TODO(HansRobo) : make custome type evaluation
         auto evaluation = std::make_shared<EvaluationBlock<double>>();
         evaluation->evaluation = board["eval"].as<std::string>();
         this->evaluation_blocks_.emplace_back(evaluation);
