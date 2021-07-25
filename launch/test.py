@@ -26,7 +26,7 @@ def generate_launch_description():
     start_descriptor_cmd = Node(
         package='ouxt_behavior_descriptor_v1', executable='ouxt_behavior_descriptor_v1_node',
         output='screen',
-        parameters=[{'config_path': config_path }]
+        parameters=[{'config_path': config_path}]
     )
 
     ld = LaunchDescription()
