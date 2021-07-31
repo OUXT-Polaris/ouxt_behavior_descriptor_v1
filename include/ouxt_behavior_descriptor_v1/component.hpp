@@ -21,7 +21,8 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
-  #include "ouxt_behavior_descriptor_v1/visibility.hpp"
+#include "behaviortree_cpp_v3/blackboard.h"
+#include "ouxt_behavior_descriptor_v1/visibility.hpp"
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
@@ -29,18 +30,16 @@
 #include "sol/sol.hpp"
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
-struct EvaluationBlockBase
-{
+namespace ouxt_behavior_descriptor_v1 {
+
+struct EvaluationBlockBase {
   std::string evaluation;
-  virtual void evaluate(sol::state & state) = 0;
+  virtual void evaluate(sol::state &state) = 0;
 };
-template<class T>
-struct EvaluationBlock : EvaluationBlockBase
-{
+template <class T> struct EvaluationBlock : EvaluationBlockBase {
   T result;
 
-  void evaluate(sol::state & state) override
-  {
+  void evaluate(sol::state &state) override {
     std::string eval = "return " + evaluation;
     auto result = state.script(eval);
     if (result.valid()) {
@@ -52,15 +51,13 @@ struct EvaluationBlock : EvaluationBlockBase
   }
 };
 
-
-class Component : public rclcpp::Node
-{
+class Component : public rclcpp::Node {
 public:
   OUXT_BEHAVIOR_DESCRIPTOR_V1__PUBLIC
-  Component(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("ouxt_behavior_descriptor_v1_node", options)
-  {
-    declare_parameter<std::string>("config_package", "ouxt_behavior_descriptor_v1");
+  Component(const rclcpp::NodeOptions &options)
+      : rclcpp::Node("ouxt_behavior_descriptor_v1_node", options) {
+    declare_parameter<std::string>("config_package",
+                                   "ouxt_behavior_descriptor_v1");
     get_parameter("config_package", config_package_);
     declare_parameter<std::string>("config_file", "test/example/test.yaml");
     get_parameter("config_file", config_file_);
@@ -69,15 +66,16 @@ public:
 
     using std::literals::chrono_literals::operator""s;
     auto interval = 1s / update_rate_;
-    timer_ = create_wall_timer(interval, std::bind(&Component::evaluationCallback, this));
+    timer_ = create_wall_timer(interval,
+                               std::bind(&Component::evaluationCallback, this));
     std::string config_path =
-      ament_index_cpp::get_package_share_directory(config_package_) + "/" + config_file_;
+        ament_index_cpp::get_package_share_directory(config_package_) + "/" +
+        config_file_;
     initialize(config_path);
   }
   ~Component() {}
 
-  void initialize(std::string file_path)
-  {
+  void initialize(std::string file_path) {
     node_ = YAML::LoadFile(file_path);
     node_ >> format_;
 
@@ -85,7 +83,9 @@ public:
 
     if (node_["behavior"]["blackboard"]) {
       for (auto board : node_["behavior"]["blackboard"]) {
-        if (!board["eval"]) {continue;}
+        if (!board["eval"]) {
+          continue;
+        }
         // TODO(HansRobo) : make custome type evaluation
         auto evaluation = std::make_shared<EvaluationBlock<double>>();
         evaluation->evaluation = board["eval"].as<std::string>();
@@ -94,9 +94,14 @@ public:
     }
   }
 
-  void evaluationCallback()
-  {
-    for (auto & block : evaluation_blocks_) {
+    template<typename T>
+    void setValueToBlackBoard(const std::string & key, const T & value)
+    {
+      black_board_->set(key, value);
+    }
+
+  void evaluationCallback() {
+    for (auto &block : evaluation_blocks_) {
       block->evaluate(lua_);
     }
   }
@@ -109,6 +114,8 @@ public:
   sol::state lua_;
   std::vector<std::shared_ptr<EvaluationBlockBase>> evaluation_blocks_;
   rclcpp::TimerBase::SharedPtr timer_;
+  BT::Blackboard::Ptr black_board_;
 };
+}  // namespace ouxt_behavior_descriptor_v1
 
 #endif  // OUXT_BEHAVIOR_DESCRIPTOR_V1__COMPONENT_HPP_

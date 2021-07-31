@@ -19,9 +19,8 @@
 #include "yaml-cpp/yaml.h"
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 
-
-void operator>>(const YAML::Node & node, Position & position)
-{
+namespace ouxt_behavior_descriptor_v1 {
+void operator>>(const YAML::Node &node, Position &position) {
   try {
     position.x = node["x"].as<double>();
     position.y = node["y"].as<double>();
@@ -33,8 +32,7 @@ void operator>>(const YAML::Node & node, Position & position)
     std::cout << "parse error : Position" << std::endl;
   }
 }
-void operator>>(const YAML::Node & node, Quaternion & quaternion)
-{
+void operator>>(const YAML::Node &node, Quaternion &quaternion) {
   try {
     quaternion.x = node["x"].as<double>();
     quaternion.y = node["y"].as<double>();
@@ -49,8 +47,7 @@ void operator>>(const YAML::Node & node, Quaternion & quaternion)
   }
 }
 
-void operator>>(const YAML::Node & node, Pose & pose)
-{
+void operator>>(const YAML::Node &node, Pose &pose) {
   try {
     node["position"] >> pose.position;
     node["orientation"] >> pose.orientation;
@@ -59,11 +56,10 @@ void operator>>(const YAML::Node & node, Pose & pose)
   }
 }
 
-void operator>>(const YAML::Node & node, Object & object)
-{
+void operator>>(const YAML::Node &node, Object &object) {
   try {
     object.uuid = node["uuid"].as<int>();
-    const YAML::Node & attributes_node = node["attributes"];
+    const YAML::Node &attributes_node = node["attributes"];
     for (auto attribute_node : attributes_node) {
       std::string attribute = attribute_node.as<std::string>();
       object.attributes.push_back(attribute);
@@ -74,8 +70,7 @@ void operator>>(const YAML::Node & node, Object & object)
   }
 }
 
-void operator>>(const YAML::Node & node, BlackBoard & blackboard)
-{
+void operator>>(const YAML::Node &node, BlackBoard &blackboard) {
   try {
     blackboard.input = node["input"].as<std::string>();
     blackboard.eval = node["eval"].as<std::string>();
@@ -86,11 +81,10 @@ void operator>>(const YAML::Node & node, BlackBoard & blackboard)
   }
 }
 
-void operator>>(const YAML::Node & node, Behavior & behavior)
-{
+void operator>>(const YAML::Node &node, Behavior &behavior) {
   try {
     behavior.description = node["description"].as<std::string>();
-    const YAML::Node & blackboards_node = node["blackboard"];
+    const YAML::Node &blackboards_node = node["blackboard"];
     for (auto blackboard_node : blackboards_node) {
       BlackBoard blackboard;
       blackboard_node >> blackboard;
@@ -102,11 +96,10 @@ void operator>>(const YAML::Node & node, Behavior & behavior)
   }
 }
 
-void operator>>(const YAML::Node & node, Format & format)
-{
+void operator>>(const YAML::Node &node, Format &format) {
   try {
     node["behavior"] >> format.behavior;
-    const YAML::Node & objects_node = node["objects"];
+    const YAML::Node &objects_node = node["objects"];
     for (auto object_node : objects_node) {
       Object object;
       object_node >> object;
@@ -116,5 +109,6 @@ void operator>>(const YAML::Node & node, Format & format)
     std::cout << "parse error : Format" << std::endl;
   }
 }
+}  // namespace ouxt_behavior_descriptor_v1
 
 #endif  // OUXT_BEHAVIOR_DESCRIPTOR_V1__OPERATORS_HPP_

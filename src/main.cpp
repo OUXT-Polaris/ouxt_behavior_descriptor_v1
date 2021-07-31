@@ -21,7 +21,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<Component>(options);
+  auto component = std::make_shared<ouxt_behavior_descriptor_v1::Component>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

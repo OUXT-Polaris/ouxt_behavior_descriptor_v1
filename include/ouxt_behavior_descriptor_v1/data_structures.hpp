@@ -18,42 +18,36 @@
 #include <string>
 #include <vector>
 
-struct BlackBoard
-{
+namespace ouxt_behavior_descriptor_v1 {
+struct BlackBoard {
   std::string input;
   std::string eval;
 };
 
-struct Behavior
-{
+struct Behavior {
   std::string description;
   std::vector<BlackBoard> blackboard;
 };
-struct Position
-{
+struct Position {
   double x, y, z;
 };
-struct Quaternion
-{
+struct Quaternion {
   double x, y, z, w;
 };
-struct Pose
-{
+struct Pose {
   Position position;
   Quaternion orientation;
 };
 
-struct Object
-{
+struct Object {
   int uuid;
   std::vector<std::string> attributes;
   Pose pose;
 };
 
-
-struct Format
-{
+struct Format {
   Behavior behavior;
   std::vector<Object> objects;
 };
+}  // namespace ouxt_behavior_descriptor_v
 #endif  // OUXT_BEHAVIOR_DESCRIPTOR_V1__DATA_STRUCTURES_HPP_
