@@ -21,7 +21,7 @@
 #include <vector>
 
 #include "rclcpp/rclcpp.hpp"
-//  #include "ouxt_behavior_descriptor_v1/visibility.hpp"
+  #include "ouxt_behavior_descriptor_v1/visibility.hpp"
 #include "ouxt_behavior_descriptor_v1/data_structures.hpp"
 #include "ouxt_behavior_descriptor_v1/operators.hpp"
 
@@ -56,7 +56,8 @@ struct EvaluationBlock : EvaluationBlockBase
 class Component : public rclcpp::Node
 {
 public:
-  explicit Component(const rclcpp::NodeOptions & options)
+  OUXT_BEHAVIOR_DESCRIPTOR_V1__PUBLIC
+  Component(const rclcpp::NodeOptions & options)
   : rclcpp::Node("ouxt_behavior_descriptor_v1_node", options)
   {
     declare_parameter<std::string>("config_package", "ouxt_behavior_descriptor_v1");
